@@ -1,16 +1,200 @@
-# React + Vite
+# 👨‍💻 Amit Kumar Singh — Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+> A modern, responsive developer portfolio showcasing my skills, projects, experience, and journey as a Software Engineer & AI Developer.
 
-Currently, two official plugins are available:
+[![Live Portfolio](https://img.shields.io/badge/🌐_Live_Portfolio-Visit_Website-black?style=for-the-badge)](https://portfolio-seven-nu-tg0pyf71zz.vercel.app/)
+[![GitHub](https://img.shields.io/badge/GitHub-amitx22-181717?style=for-the-badge\&logo=github)](https://github.com/amitx22)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## 🚀 About The Project
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+This repository contains my personal developer portfolio website.
 
-## Expanding the Oxlint configuration
+The portfolio is designed to provide a clean and professional overview of my:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+* 💻 Software development skills
+* 🤖 AI & development interests
+* 🚀 Projects and practical work
+* 🧑‍💻 Technical experience
+* 📚 Learning journey
+* 📬 Contact information
+
+The website is fully responsive and optimized for a smooth experience across desktop and mobile devices.
+
+---
+
+## ✨ Features
+
+* 🎨 Modern and clean UI
+* 📱 Fully responsive design
+* ⚡ Fast performance with Vite
+* ⚛️ Built with React
+* 🧩 Component-based architecture
+* 💼 Projects showcase
+* 🛠️ Skills & technologies section
+* 👨‍💻 Developer profile section
+* 📬 Contact section
+* 🌐 Deployed on Vercel
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+
+* **React.js**
+* **JavaScript**
+* **HTML5**
+* **CSS3**
+* **Vite**
+
+### Development Tools
+
+* **Git**
+* **GitHub**
+* **VS Code**
+* **Vercel**
+
+---
+
+## 📂 Project Structure
+
+```text
+portfolio/
+│
+├── public/
+│   └── assets/
+│
+├── src/
+│   ├── components/
+│   ├── assets/
+│   ├── App.jsx
+│   ├── main.jsx
+│   └── ...
+│
+├── .gitignore
+├── index.html
+├── package.json
+├── package-lock.json
+├── vite.config.js
+└── README.md
+```
+
+---
+
+## ⚙️ Getting Started
+
+Follow these steps to run the portfolio locally.
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/amitx22/portfolio.git
+```
+
+### 2. Navigate to the project
+
+```bash
+cd portfolio
+```
+
+### 3. Install dependencies
+
+```bash
+npm install
+```
+
+### 4. Start the development server
+
+```bash
+npm run dev
+```
+
+The application will be available at:
+
+```text
+http://localhost:5173
+```
+
+---
+
+## 📦 Build For Production
+
+To create a production build:
+
+```bash
+npm run build
+```
+
+To preview the production build locally:
+
+```bash
+npm run preview
+```
+
+---
+
+## 🌐 Live Demo
+
+🚀 **Check out the live portfolio:**
+
+**https://portfolio-seven-nu-tg0pyf71zz.vercel.app/**
+
+---
+
+## 📸 Portfolio Preview
+
+> Add a screenshot of your portfolio here for a more attractive GitHub README.
+
+```md
+![Portfolio Preview](./public/portfolio-preview.png)
+```
+
+---
+
+## 🎯 Goals
+
+The main goals of this project are to:
+
+* Build a strong developer presence online
+* Showcase my projects and technical skills
+* Practice modern frontend development
+* Continuously improve UI/UX and performance
+* Document my growth as a developer
+
+---
+
+## 🔮 Future Improvements
+
+* [ ] Add more projects
+* [ ] Add detailed project case studies
+* [ ] Improve animations and interactions
+* [ ] Add blog section
+* [ ] Add downloadable resume
+* [ ] Improve accessibility
+* [ ] Add more performance optimizations
+
+---
+
+## 🤝 Connect With Me
+
+I'm always open to connecting, collaborating, and learning from other developers.
+
+**GitHub:**
+https://github.com/amitx22
+
+**Portfolio:**
+https://portfolio-seven-nu-tg0pyf71zz.vercel.app/
+
+---
+
+## ⭐ Show Your Support
+
+If you like this portfolio, consider giving the repository a ⭐ on GitHub.
+
+---
+
+### 💙 Built with React + Vite
+
+**Amit Kumar Singh**
