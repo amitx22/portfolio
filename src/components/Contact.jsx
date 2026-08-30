@@ -1,23 +1,18 @@
 import React, { useState } from 'react';
 import { portfolioData } from '../data/portfolioData';
-import emailjs from '@emailjs/browser';
 import confetti from 'canvas-confetti';
-import { 
-  Send, 
-  Mail, 
-  Phone, 
-  MessageSquare, 
-  CheckCircle2, 
-  Copy, 
-  Check, 
-  Sparkles, 
-  Clock, 
-  MapPin, 
+import {
+  Send,
+  Mail,
+  Phone,
+  MessageSquare,
+  CheckCircle2,
+  Copy,
+  Check,
+  Sparkles,
+  Clock,
   ExternalLink,
-  AlertCircle,
-  Loader2,
-  Settings,
-  HelpCircle
+  Loader2
 } from 'lucide-react';
 
 const Contact = ({ onNotify }) => {
@@ -32,20 +27,28 @@ const Contact = ({ onNotify }) => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedPhone, setCopiedPhone] = useState(false);
-  const [showConfig, setShowConfig] = useState(false);
 
-  // EmailJS Configuration State (with fallback instructions)
-  const [emailConfig, setEmailConfig] = useState({
-    serviceId: 'service_gmail_portfolio',
-    templateId: 'template_portfolio_msg',
-    publicKey: 'user_public_key'
-  });
+  // ==========================================
+  // WEB3FORMS ACCESS KEY
+  // ==========================================
+  const WEB3FORMS_ACCESS_KEY =
+    '8e46d744-8142-43df-8258-f1410d8fb4c1';
 
+  // ==========================================
+  // INPUT CHANGE
+  // ==========================================
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
+  // ==========================================
+  // CONFETTI
+  // ==========================================
   const triggerConfetti = () => {
     try {
       confetti({
@@ -54,143 +57,319 @@ const Contact = ({ onNotify }) => {
         origin: { y: 0.6 },
         colors: ['#38bdf8', '#10b981', '#6366f1', '#f59e0b']
       });
-    } catch (e) {
-      console.log('Confetti triggered');
+    } catch (error) {
+      console.log('Confetti error:', error);
     }
   };
 
-  const handleCopy = (text, type) => {
-    navigator.clipboard.writeText(text);
-    if (type === 'email') {
-      setCopiedEmail(true);
-      setTimeout(() => setCopiedEmail(false), 2500);
-      if (onNotify) onNotify('Email address copied to clipboard!', 'success');
-    } else {
-      setCopiedPhone(true);
-      setTimeout(() => setCopiedPhone(false), 2500);
-      if (onNotify) onNotify('Phone number copied to clipboard!', 'success');
+  // ==========================================
+  // COPY EMAIL / PHONE
+  // ==========================================
+  const handleCopy = async (text, type) => {
+    try {
+      await navigator.clipboard.writeText(text);
+
+      if (type === 'email') {
+        setCopiedEmail(true);
+
+        setTimeout(() => {
+          setCopiedEmail(false);
+        }, 2500);
+
+        if (onNotify) {
+          onNotify(
+            'Email address copied to clipboard!',
+            'success'
+          );
+        }
+      } else {
+        setCopiedPhone(true);
+
+        setTimeout(() => {
+          setCopiedPhone(false);
+        }, 2500);
+
+        if (onNotify) {
+          onNotify(
+            'Phone number copied to clipboard!',
+            'success'
+          );
+        }
+      }
+    } catch (error) {
+      console.error('Copy failed:', error);
     }
   };
 
+  // ==========================================
+  // WEB3FORMS SUBMIT
+  // ==========================================
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.email || !formData.message) {
-      if (onNotify) onNotify('Please complete all required fields.', 'error');
+    if (
+      !formData.name.trim() ||
+      !formData.email.trim() ||
+      !formData.message.trim()
+    ) {
+      if (onNotify) {
+        onNotify(
+          'Please complete all required fields.',
+          'error'
+        );
+      }
+
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      // Attempt EmailJS send if custom keys are set, or simulate real-time pipeline
-      let sentSuccessfully = false;
+      // Create form data
+      const web3FormData = new FormData();
 
-      if (emailConfig.publicKey !== 'user_public_key' && emailConfig.serviceId) {
-        await emailjs.send(
-          emailConfig.serviceId,
-          emailConfig.templateId,
-          {
-            from_name: formData.name,
-            from_email: formData.email,
-            subject: formData.subject || 'New Portfolio Inquiry',
-            message: formData.message,
-            to_email: portfolioData.personal.email,
-          },
-          emailConfig.publicKey
-        );
-        sentSuccessfully = true;
-      } else {
-        // High-fidelity fallback: simulates asynchronous network dispatch and persists inquiry
-        await new Promise((resolve) => setTimeout(resolve, 1200));
-        
-        // Save to local persistence so Amit can view submissions in browser storage
-        const existingMessages = JSON.parse(localStorage.getItem('amit_portfolio_inquiries') || '[]');
-        existingMessages.push({
-          ...formData,
-          receivedAt: new Date().toISOString(),
-          target: portfolioData.personal.email
-        });
-        localStorage.setItem('amit_portfolio_inquiries', JSON.stringify(existingMessages));
-        sentSuccessfully = true;
-      }
+      // Web3Forms Access Key
+      web3FormData.append(
+        'access_key',
+        WEB3FORMS_ACCESS_KEY
+      );
 
-      if (sentSuccessfully) {
-        setIsSuccess(true);
-        triggerConfetti();
-        if (onNotify) {
-          onNotify(`Message dispatched in real time to ${portfolioData.personal.email}!`, 'success');
+      // User details
+      web3FormData.append(
+        'name',
+        formData.name.trim()
+      );
+
+      web3FormData.append(
+        'email',
+        formData.email.trim()
+      );
+
+      // Subject
+      web3FormData.append(
+        'subject',
+        formData.subject.trim() ||
+        'New Portfolio Inquiry'
+      );
+
+      // Message
+      web3FormData.append(
+        'message',
+        formData.message.trim()
+      );
+
+      // Sender name
+      web3FormData.append(
+        'from_name',
+        'Amit Portfolio'
+      );
+
+      // Optional reply-to email
+      web3FormData.append(
+        'replyto',
+        formData.email.trim()
+      );
+
+      // ==========================================
+      // SEND TO WEB3FORMS
+      // ==========================================
+      const response = await fetch(
+        'https://api.web3forms.com/submit',
+        {
+          method: 'POST',
+          body: web3FormData
         }
-        setFormData({ name: '', email: '', subject: '', message: '' });
+      );
+
+      const result = await response.json();
+
+      console.log('Web3Forms Response:', result);
+
+      // ==========================================
+      // SUCCESS
+      // ==========================================
+      if (response.ok && result.success) {
+        setIsSuccess(true);
+
+        triggerConfetti();
+
+        if (onNotify) {
+          onNotify(
+            'Message sent successfully! Check your Gmail.',
+            'success'
+          );
+        }
+
+        // Clear form
+        setFormData({
+          name: '',
+          email: '',
+          subject: '',
+          message: ''
+        });
+      } else {
+        console.error(
+          'Web3Forms Error:',
+          result
+        );
+
+        if (onNotify) {
+          onNotify(
+            result.message ||
+            'Message could not be sent.',
+            'error'
+          );
+        }
       }
     } catch (error) {
-      console.error('Email send error:', error);
+      console.error(
+        'Web3Forms Error:',
+        error
+      );
+
       if (onNotify) {
-        onNotify('Direct delivery encountered an issue. Launching your mail app...', 'error');
+        onNotify(
+          'Something went wrong! Please try again.',
+          'error'
+        );
       }
-      // Direct Fallback to mailto
-      window.location.href = `mailto:${portfolioData.personal.email}?subject=${encodeURIComponent(formData.subject || 'Portfolio Inquiry')}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`)}`;
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  // ==========================================
+  // OPEN GMAIL
+  // ==========================================
   const openGmailDirectly = () => {
-    const subject = encodeURIComponent(formData.subject || 'Connecting from Portfolio');
-    const body = encodeURIComponent(
-      `Hello Amit,\n\nI am reaching out through your portfolio.\n\nName: ${formData.name || '[Your Name]'}\nMessage:\n${formData.message || '[Your message here]'}`
+    const subject = encodeURIComponent(
+      formData.subject ||
+      'Connecting from Portfolio'
     );
-    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${portfolioData.personal.email}&su=${subject}&body=${body}`;
-    window.open(gmailUrl, '_blank');
+
+    const body = encodeURIComponent(
+      `Hello Amit,
+
+I am reaching out through your portfolio.
+
+Name: ${formData.name || '[Your Name]'
+      }
+
+Email: ${formData.email || '[Your Email]'
+      }
+
+Message:
+${formData.message ||
+      '[Your message here]'
+      }`
+    );
+
+    const gmailUrl =
+      `https://mail.google.com/mail/?view=cm&fs=1` +
+      `&to=${portfolioData.personal.email}` +
+      `&su=${subject}` +
+      `&body=${body}`;
+
+    window.open(
+      gmailUrl,
+      '_blank',
+      'noopener,noreferrer'
+    );
   };
 
   return (
-    <section id="contact" className="section" style={{ position: 'relative' }}>
+    <section
+      id="contact"
+      className="section"
+      style={{
+        position: 'relative'
+      }}
+    >
       <div className="container">
-        
-        {/* Section Header */}
+
+        {/* ================= HEADER ================= */}
+
         <div className="section-header">
+
           <div className="section-tag">
             <Mail size={14} />
-            <span>Direct Inbox Connection</span>
+
+            <span>
+              Direct Inbox Connection
+            </span>
           </div>
+
           <h2 className="section-title">
-            Let's Build Something <span className="gradient-text">Exceptional</span>
+            Let's Build Something{' '}
+
+            <span className="gradient-text">
+              Exceptional
+            </span>
           </h2>
+
           <p className="section-subtitle">
-            Send me a direct real-time message to my personal Gmail inbox at <strong style={{ color: '#38bdf8' }}>{portfolioData.personal.email}</strong>.
+            Send me a direct message to my
+            personal Gmail inbox at{' '}
+
+            <strong
+              style={{
+                color: '#38bdf8'
+              }}
+            >
+              {portfolioData.personal.email}
+            </strong>.
           </p>
+
         </div>
 
-        {/* Contact Layout Grid */}
-        <div 
+        {/* ================= CONTACT GRID ================= */}
+
+        <div
+          className="contact-grid"
           style={{
             display: 'grid',
             gridTemplateColumns: '1fr 1.3fr',
             gap: '2.5rem',
             alignItems: 'start'
           }}
-          className="contact-grid"
         >
-          
-          {/* Left Column: Direct Info & Quick Action Tiles */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            
-            {/* Primary Email Card */}
-            <div 
+
+          {/* ================= LEFT ================= */}
+
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1.25rem'
+            }}
+          >
+
+            {/* ================= EMAIL CARD ================= */}
+
+            <div
               className="glass-card"
               style={{
                 padding: '1.6rem',
                 borderLeft: '4px solid #38bdf8'
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.8rem' }}>
-                <div 
+
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginBottom: '0.8rem'
+                }}
+              >
+
+                <div
                   style={{
                     width: '42px',
                     height: '42px',
                     borderRadius: '10px',
-                    background: 'rgba(56, 189, 248, 0.15)',
+                    background:
+                      'rgba(56, 189, 248, 0.15)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -199,12 +378,23 @@ const Contact = ({ onNotify }) => {
                 >
                   <Mail size={20} />
                 </div>
+
                 <button
-                  onClick={() => handleCopy(portfolioData.personal.email, 'email')}
+                  type="button"
+                  onClick={() =>
+                    handleCopy(
+                      portfolioData.personal.email,
+                      'email'
+                    )
+                  }
                   style={{
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    color: copiedEmail ? '#10b981' : '#94a3b8',
+                    background:
+                      'rgba(255,255,255,0.05)',
+                    border:
+                      '1px solid rgba(255,255,255,0.1)',
+                    color: copiedEmail
+                      ? '#10b981'
+                      : '#94a3b8',
                     borderRadius: '8px',
                     padding: '0.35rem 0.75rem',
                     fontSize: '0.78rem',
@@ -214,50 +404,95 @@ const Contact = ({ onNotify }) => {
                     gap: '0.35rem',
                     fontFamily: 'var(--font-mono)'
                   }}
-                  title="Copy email to clipboard"
                 >
-                  {copiedEmail ? <Check size={14} /> : <Copy size={14} />}
-                  <span>{copiedEmail ? 'Copied!' : 'Copy'}</span>
+                  {copiedEmail ? (
+                    <Check size={14} />
+                  ) : (
+                    <Copy size={14} />
+                  )}
+
+                  <span>
+                    {copiedEmail
+                      ? 'Copied!'
+                      : 'Copy'}
+                  </span>
                 </button>
+
               </div>
 
-              <div style={{ fontSize: '0.78rem', color: '#64748b', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
+              <div
+                style={{
+                  fontSize: '0.78rem',
+                  color: '#64748b',
+                  textTransform: 'uppercase',
+                  fontFamily: 'var(--font-mono)'
+                }}
+              >
                 Gmail Address
               </div>
-              <a 
+
+              <a
                 href={`mailto:${portfolioData.personal.email}`}
-                style={{ fontSize: '1.05rem', fontWeight: 700, color: '#f8fafc', wordBreak: 'break-all' }}
+                style={{
+                  fontSize: '1.05rem',
+                  fontWeight: 700,
+                  color: '#f8fafc',
+                  wordBreak: 'break-all'
+                }}
               >
                 {portfolioData.personal.email}
               </a>
 
-              <div style={{ marginTop: '0.9rem' }}>
+              <div
+                style={{
+                  marginTop: '0.9rem'
+                }}
+              >
                 <button
+                  type="button"
                   onClick={openGmailDirectly}
                   className="btn btn-outline-cyan btn-sm"
-                  style={{ width: '100%', fontSize: '0.82rem' }}
+                  style={{
+                    width: '100%',
+                    fontSize: '0.82rem'
+                  }}
                 >
                   <ExternalLink size={14} />
-                  <span>Open directly in Gmail Web</span>
+
+                  <span>
+                    Open directly in Gmail Web
+                  </span>
                 </button>
               </div>
+
             </div>
 
-            {/* Phone & WhatsApp Card */}
-            <div 
+            {/* ================= PHONE CARD ================= */}
+
+            <div
               className="glass-card"
               style={{
                 padding: '1.6rem',
                 borderLeft: '4px solid #10b981'
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.8rem' }}>
-                <div 
+
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginBottom: '0.8rem'
+                }}
+              >
+
+                <div
                   style={{
                     width: '42px',
                     height: '42px',
                     borderRadius: '10px',
-                    background: 'rgba(16, 185, 129, 0.15)',
+                    background:
+                      'rgba(16,185,129,0.15)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -266,12 +501,23 @@ const Contact = ({ onNotify }) => {
                 >
                   <Phone size={20} />
                 </div>
+
                 <button
-                  onClick={() => handleCopy(portfolioData.personal.phone, 'phone')}
+                  type="button"
+                  onClick={() =>
+                    handleCopy(
+                      portfolioData.personal.phone,
+                      'phone'
+                    )
+                  }
                   style={{
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    color: copiedPhone ? '#10b981' : '#94a3b8',
+                    background:
+                      'rgba(255,255,255,0.05)',
+                    border:
+                      '1px solid rgba(255,255,255,0.1)',
+                    color: copiedPhone
+                      ? '#10b981'
+                      : '#94a3b8',
                     borderRadius: '8px',
                     padding: '0.35rem 0.75rem',
                     fontSize: '0.78rem',
@@ -282,46 +528,96 @@ const Contact = ({ onNotify }) => {
                     fontFamily: 'var(--font-mono)'
                   }}
                 >
-                  {copiedPhone ? <Check size={14} /> : <Copy size={14} />}
-                  <span>{copiedPhone ? 'Copied!' : 'Copy'}</span>
+                  {copiedPhone ? (
+                    <Check size={14} />
+                  ) : (
+                    <Copy size={14} />
+                  )}
+
+                  <span>
+                    {copiedPhone
+                      ? 'Copied!'
+                      : 'Copy'}
+                  </span>
                 </button>
+
               </div>
 
-              <div style={{ fontSize: '0.78rem', color: '#64748b', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
+              <div
+                style={{
+                  fontSize: '0.78rem',
+                  color: '#64748b',
+                  textTransform: 'uppercase',
+                  fontFamily: 'var(--font-mono)'
+                }}
+              >
                 Direct Phone / WhatsApp
               </div>
-              <div style={{ fontSize: '1.15rem', fontWeight: 700, color: '#f8fafc', fontFamily: 'var(--font-mono)' }}>
+
+              <div
+                style={{
+                  fontSize: '1.15rem',
+                  fontWeight: 700,
+                  color: '#f8fafc',
+                  fontFamily: 'var(--font-mono)'
+                }}
+              >
                 {portfolioData.personal.phone}
               </div>
 
-              <div style={{ display: 'flex', gap: '0.6rem', marginTop: '0.9rem' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  gap: '0.6rem',
+                  marginTop: '0.9rem'
+                }}
+              >
+
                 <a
-                  href={`https://wa.me/${portfolioData.personal.whatsapp}?text=Hi%20Amit%2C%20I%20saw%20your%20portfolio%20and%20would%20like%20to%20connect!`}
+                  href={`https://wa.me/${portfolioData.personal.whatsapp}?text=Hi%20Amit%2C%20I%20saw%20your%20portfolio%20and%20would%20like%20to%20connect`}
                   target="_blank"
                   rel="noreferrer"
                   className="btn btn-secondary btn-sm"
-                  style={{ flex: 1, borderColor: 'rgba(16, 185, 129, 0.3)', color: '#34d399' }}
+                  style={{
+                    flex: 1,
+                    borderColor:
+                      'rgba(16,185,129,0.3)',
+                    color: '#34d399'
+                  }}
                 >
                   <MessageSquare size={14} />
-                  <span>WhatsApp</span>
+
+                  <span>
+                    WhatsApp
+                  </span>
                 </a>
 
                 <a
                   href={`tel:${portfolioData.personal.phone}`}
                   className="btn btn-secondary btn-sm"
-                  style={{ flex: 1 }}
+                  style={{
+                    flex: 1
+                  }}
                 >
                   <Phone size={14} />
-                  <span>Call Now</span>
+
+                  <span>
+                    Call Now
+                  </span>
                 </a>
+
               </div>
+
             </div>
 
-            {/* Real-time Response Badge */}
-            <div 
+            {/* ================= RESPONSE TIME ================= */}
+
+            <div
               style={{
-                background: 'rgba(15, 23, 42, 0.6)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
+                background:
+                  'rgba(15,23,42,0.6)',
+                border:
+                  '1px solid rgba(255,255,255,0.08)',
                 borderRadius: 'var(--radius-md)',
                 padding: '1.2rem',
                 display: 'flex',
@@ -329,12 +625,14 @@ const Contact = ({ onNotify }) => {
                 gap: '0.85rem'
               }}
             >
-              <div 
+
+              <div
                 style={{
                   width: '36px',
                   height: '36px',
                   borderRadius: '50%',
-                  background: 'rgba(56, 189, 248, 0.15)',
+                  background:
+                    'rgba(56,189,248,0.15)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -343,40 +641,95 @@ const Contact = ({ onNotify }) => {
               >
                 <Clock size={18} />
               </div>
+
               <div>
-                <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#f8fafc' }}>
+
+                <div
+                  style={{
+                    fontSize: '0.9rem',
+                    fontWeight: 700,
+                    color: '#f8fafc'
+                  }}
+                >
                   Swift Response Time
                 </div>
-                <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
-                  Typically replies within 24 hours for internship & engineering opportunities.
+
+                <div
+                  style={{
+                    fontSize: '0.78rem',
+                    color: '#94a3b8'
+                  }}
+                >
+                  Typically replies within
+                  24 hours for internship &
+                  engineering opportunities.
                 </div>
+
               </div>
+
             </div>
 
           </div>
 
-          {/* Right Column: Real-time Message Form */}
-          <div 
+          {/* ================= RIGHT ================= */}
+
+          <div
             className="glass-card"
             style={{
               padding: '2.5rem',
               position: 'relative'
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.75rem' }}>
+
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '1.75rem'
+              }}
+            >
+
               <div>
-                <h3 style={{ fontSize: '1.45rem', color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                  <span>Send a Real-Time Message</span>
-                  <Sparkles size={18} color="#38bdf8" />
+
+                <h3
+                  style={{
+                    fontSize: '1.45rem',
+                    color: '#f8fafc',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.6rem'
+                  }}
+                >
+                  <span>
+                    Send a Message
+                  </span>
+
+                  <Sparkles
+                    size={18}
+                    color="#38bdf8"
+                  />
                 </h3>
-                <p style={{ fontSize: '0.85rem', color: '#94a3b8' }}>
-                  Delivered straight to Amit's Gmail inbox in real-time.
+
+                <p
+                  style={{
+                    fontSize: '0.85rem',
+                    color: '#94a3b8'
+                  }}
+                >
+                  Delivered straight to
+                  Amit's Gmail inbox.
                 </p>
+
               </div>
+
             </div>
 
+            {/* ================= SUCCESS ================= */}
+
             {isSuccess ? (
-              <div 
+
+              <div
                 style={{
                   textAlign: 'center',
                   padding: '3rem 1.5rem',
@@ -386,57 +739,124 @@ const Contact = ({ onNotify }) => {
                   gap: '1rem'
                 }}
               >
-                <div 
+
+                <div
                   style={{
                     width: '64px',
                     height: '64px',
                     borderRadius: '50%',
-                    background: 'rgba(16, 185, 129, 0.15)',
+                    background:
+                      'rgba(16,185,129,0.15)',
                     border: '2px solid #10b981',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     color: '#10b981',
-                    boxShadow: '0 0 30px rgba(16, 185, 129, 0.3)'
+                    boxShadow:
+                      '0 0 30px rgba(16,185,129,0.3)'
                   }}
                 >
                   <CheckCircle2 size={36} />
                 </div>
-                
-                <h4 style={{ fontSize: '1.5rem', color: '#f8fafc' }}>
+
+                <h4
+                  style={{
+                    fontSize: '1.5rem',
+                    color: '#f8fafc'
+                  }}
+                >
                   Message Sent Successfully!
                 </h4>
 
-                <p style={{ fontSize: '0.95rem', color: '#94a3b8', maxWidth: '420px', lineHeight: 1.6 }}>
-                  Thank you for reaching out! Your inquiry has been forwarded to <strong>{portfolioData.personal.email}</strong>. I will get back to you promptly.
+                <p
+                  style={{
+                    fontSize: '0.95rem',
+                    color: '#94a3b8',
+                    maxWidth: '420px',
+                    lineHeight: 1.6
+                  }}
+                >
+                  Thank you for reaching out!
+                  Your message has been sent to{' '}
+
+                  <strong>
+                    {portfolioData.personal.email}
+                  </strong>.
                 </p>
 
-                <div style={{ display: 'flex', gap: '0.8rem', marginTop: '1rem' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '0.8rem',
+                    marginTop: '1rem'
+                  }}
+                >
+
                   <button
-                    onClick={() => setIsSuccess(false)}
+                    type="button"
+                    onClick={() =>
+                      setIsSuccess(false)
+                    }
                     className="btn btn-primary"
                   >
                     Send Another Message
                   </button>
+
                   <button
+                    type="button"
                     onClick={openGmailDirectly}
                     className="btn btn-secondary"
                   >
                     <ExternalLink size={16} />
                     Open Gmail
                   </button>
+
                 </div>
+
               </div>
+
             ) : (
-              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }} className="form-row">
+
+              /* ================= FORM ================= */
+
+              <form
+                onSubmit={handleSubmit}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '1.25rem'
+                }}
+              >
+
+                {/* NAME + EMAIL */}
+
+                <div
+                  className="form-row"
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: '1rem'
+                  }}
+                >
+
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.82rem', color: '#cbd5e1', fontWeight: 600, marginBottom: '0.45rem', fontFamily: 'var(--font-mono)' }}>
+
+                    <label
+                      style={{
+                        display: 'block',
+                        fontSize: '0.82rem',
+                        color: '#cbd5e1',
+                        fontWeight: 600,
+                        marginBottom: '0.45rem',
+                        fontFamily:
+                          'var(--font-mono)'
+                      }}
+                    >
                       Your Full Name *
                     </label>
-                    <input 
-                      type="text" 
+
+                    <input
+                      type="text"
                       name="name"
                       value={formData.name}
                       onChange={handleInputChange}
@@ -446,31 +866,38 @@ const Contact = ({ onNotify }) => {
                         width: '100%',
                         padding: '0.85rem 1rem',
                         borderRadius: '10px',
-                        background: 'rgba(255, 255, 255, 0.04)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        background:
+                          'rgba(255,255,255,0.04)',
+                        border:
+                          '1px solid rgba(255,255,255,0.1)',
                         color: '#f8fafc',
                         fontSize: '0.95rem',
-                        fontFamily: 'var(--font-body)',
-                        outline: 'none',
-                        transition: 'all 0.2s ease'
-                      }}
-                      onFocus={(e) => {
-                        e.target.style.borderColor = '#38bdf8';
-                        e.target.style.background = 'rgba(56, 189, 248, 0.05)';
-                      }}
-                      onBlur={(e) => {
-                        e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-                        e.target.style.background = 'rgba(255, 255, 255, 0.04)';
+                        fontFamily:
+                          'var(--font-body)',
+                        outline: 'none'
                       }}
                     />
+
                   </div>
 
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.82rem', color: '#cbd5e1', fontWeight: 600, marginBottom: '0.45rem', fontFamily: 'var(--font-mono)' }}>
+
+                    <label
+                      style={{
+                        display: 'block',
+                        fontSize: '0.82rem',
+                        color: '#cbd5e1',
+                        fontWeight: 600,
+                        marginBottom: '0.45rem',
+                        fontFamily:
+                          'var(--font-mono)'
+                      }}
+                    >
                       Your Email Address *
                     </label>
-                    <input 
-                      type="email" 
+
+                    <input
+                      type="email"
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
@@ -480,64 +907,83 @@ const Contact = ({ onNotify }) => {
                         width: '100%',
                         padding: '0.85rem 1rem',
                         borderRadius: '10px',
-                        background: 'rgba(255, 255, 255, 0.04)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        background:
+                          'rgba(255,255,255,0.04)',
+                        border:
+                          '1px solid rgba(255,255,255,0.1)',
                         color: '#f8fafc',
                         fontSize: '0.95rem',
-                        fontFamily: 'var(--font-body)',
-                        outline: 'none',
-                        transition: 'all 0.2s ease'
-                      }}
-                      onFocus={(e) => {
-                        e.target.style.borderColor = '#38bdf8';
-                        e.target.style.background = 'rgba(56, 189, 248, 0.05)';
-                      }}
-                      onBlur={(e) => {
-                        e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-                        e.target.style.background = 'rgba(255, 255, 255, 0.04)';
+                        fontFamily:
+                          'var(--font-body)',
+                        outline: 'none'
                       }}
                     />
+
                   </div>
+
                 </div>
 
+                {/* SUBJECT */}
+
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.82rem', color: '#cbd5e1', fontWeight: 600, marginBottom: '0.45rem', fontFamily: 'var(--font-mono)' }}>
+
+                  <label
+                    style={{
+                      display: 'block',
+                      fontSize: '0.82rem',
+                      color: '#cbd5e1',
+                      fontWeight: 600,
+                      marginBottom: '0.45rem',
+                      fontFamily:
+                        'var(--font-mono)'
+                    }}
+                  >
                     Subject / Opportunity
                   </label>
-                  <input 
-                    type="text" 
+
+                  <input
+                    type="text"
                     name="subject"
                     value={formData.subject}
                     onChange={handleInputChange}
-                    placeholder="e.g. Software Engineering Internship / Project Discussion"
+                    placeholder="e.g. Software Engineering Internship"
                     style={{
                       width: '100%',
                       padding: '0.85rem 1rem',
                       borderRadius: '10px',
-                      background: 'rgba(255, 255, 255, 0.04)',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      background:
+                        'rgba(255,255,255,0.04)',
+                      border:
+                        '1px solid rgba(255,255,255,0.1)',
                       color: '#f8fafc',
                       fontSize: '0.95rem',
-                      fontFamily: 'var(--font-body)',
-                      outline: 'none',
-                      transition: 'all 0.2s ease'
-                    }}
-                    onFocus={(e) => {
-                      e.target.style.borderColor = '#38bdf8';
-                      e.target.style.background = 'rgba(56, 189, 248, 0.05)';
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-                      e.target.style.background = 'rgba(255, 255, 255, 0.04)';
+                      fontFamily:
+                        'var(--font-body)',
+                      outline: 'none'
                     }}
                   />
+
                 </div>
 
+                {/* MESSAGE */}
+
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.82rem', color: '#cbd5e1', fontWeight: 600, marginBottom: '0.45rem', fontFamily: 'var(--font-mono)' }}>
+
+                  <label
+                    style={{
+                      display: 'block',
+                      fontSize: '0.82rem',
+                      color: '#cbd5e1',
+                      fontWeight: 600,
+                      marginBottom: '0.45rem',
+                      fontFamily:
+                        'var(--font-mono)'
+                    }}
+                  >
                     Your Message *
                   </label>
-                  <textarea 
+
+                  <textarea
                     name="message"
                     rows={5}
                     value={formData.message}
@@ -548,63 +994,109 @@ const Contact = ({ onNotify }) => {
                       width: '100%',
                       padding: '0.85rem 1rem',
                       borderRadius: '10px',
-                      background: 'rgba(255, 255, 255, 0.04)',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      background:
+                        'rgba(255,255,255,0.04)',
+                      border:
+                        '1px solid rgba(255,255,255,0.1)',
                       color: '#f8fafc',
                       fontSize: '0.95rem',
-                      fontFamily: 'var(--font-body)',
+                      fontFamily:
+                        'var(--font-body)',
                       outline: 'none',
-                      resize: 'vertical',
-                      transition: 'all 0.2s ease'
-                    }}
-                    onFocus={(e) => {
-                      e.target.style.borderColor = '#38bdf8';
-                      e.target.style.background = 'rgba(56, 189, 248, 0.05)';
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-                      e.target.style.background = 'rgba(255, 255, 255, 0.04)';
+                      resize: 'vertical'
                     }}
                   />
+
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+                {/* BUTTONS */}
+
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '1rem'
+                  }}
+                >
+
                   <button
                     type="submit"
                     disabled={isSubmitting}
                     className="btn btn-primary btn-lg"
-                    style={{ minWidth: '180px' }}
+                    style={{
+                      minWidth: '180px'
+                    }}
                   >
+
                     {isSubmitting ? (
                       <>
-                        <Loader2 size={18} className="anim-float" style={{ animation: 'spin 1s linear infinite' }} />
-                        <span>Sending to Gmail...</span>
+                        <Loader2
+                          size={18}
+                          style={{
+                            animation:
+                              'spin 1s linear infinite'
+                          }}
+                        />
+
+                        <span>
+                          Sending Message...
+                        </span>
                       </>
                     ) : (
                       <>
                         <Send size={18} />
-                        <span>Send Message</span>
+
+                        <span>
+                          Send Message
+                        </span>
                       </>
                     )}
+
                   </button>
 
                   <button
                     type="button"
                     onClick={openGmailDirectly}
                     className="btn btn-secondary"
-                    title="Compose directly in your browser's Gmail"
+                    title="Compose directly in Gmail"
                   >
-                    <Mail size={16} color="#ea4335" />
-                    <span>Open in Gmail</span>
+                    <Mail
+                      size={16}
+                      color="#ea4335"
+                    />
+
+                    <span>
+                      Open in Gmail
+                    </span>
                   </button>
+
                 </div>
 
-                <div style={{ fontSize: '0.78rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.5rem' }}>
-                  <CheckCircle2 size={14} color="#10b981" />
-                  <span>Real-time delivery to amitkumarsinghtelari@gmail.com</span>
+                <div
+                  style={{
+                    fontSize: '0.78rem',
+                    color: '#64748b',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                    marginTop: '0.5rem'
+                  }}
+                >
+                  <CheckCircle2
+                    size={14}
+                    color="#10b981"
+                  />
+
+                  <span>
+                    Messages delivered to{' '}
+                    {portfolioData.personal.email}
+                  </span>
                 </div>
 
               </form>
+
             )}
 
           </div>
@@ -613,20 +1105,30 @@ const Contact = ({ onNotify }) => {
 
       </div>
 
+      {/* ================= RESPONSIVE CSS ================= */}
+
       <style>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
         @media (max-width: 900px) {
           .contact-grid {
             grid-template-columns: 1fr !important;
           }
+
           .form-row {
             grid-template-columns: 1fr !important;
           }
         }
+
+        @keyframes spin {
+          from {
+            transform: rotate(0deg);
+          }
+
+          to {
+            transform: rotate(360deg);
+          }
+        }
       `}</style>
+
     </section>
   );
 };
