@@ -145,11 +145,11 @@ npm run preview
 
 ## 📸 Portfolio Preview
 
-> Add a screenshot of your portfolio here for a more attractive GitHub README.
-
-```md
-![Portfolio Preview](./portfolio-preview.png)
-```
+ <p align="center">
+  <a href="https://portfolio-seven-nu-tg0pyf71zz.vercel.app/" target="_blank">
+    <img src="./portfolio-preview.png" alt="Portfolio Preview" width="900"/>
+  </a>
+</p>
 
 ---
 
