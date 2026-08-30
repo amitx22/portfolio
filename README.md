@@ -145,7 +145,7 @@ npm run preview
 
 ## 📸 Portfolio Preview
 
- ![Portfolio Preview](./portfolio-preview.png.png)
+ ![Portfolio Preview](./portfolio-preview.png)
 
 ---
 
