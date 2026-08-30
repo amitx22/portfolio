@@ -148,7 +148,7 @@ npm run preview
 > Add a screenshot of your portfolio here for a more attractive GitHub README.
 
 ```md
-![Portfolio Preview](./public/portfolio-preview.png)
+![Portfolio Preview](./portfolio-preview.png)
 ```
 
 ---
