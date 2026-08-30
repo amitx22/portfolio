@@ -145,11 +145,7 @@ npm run preview
 
 ## 📸 Portfolio Preview
 
- <p align="center">
-  <a href="https://portfolio-seven-nu-tg0pyf71zz.vercel.app/" target="_blank">
-    <img src="./portfolio-preview.png" alt="Portfolio Preview" width="900"/>
-  </a>
-</p>
+ ![Portfolio Preview](./portfolio-preview.png.png)
 
 ---
 
