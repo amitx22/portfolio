@@ -119,6 +119,25 @@ export const portfolioData = {
 
   projects: [
     {
+      id: "ai-resume-intelligence",
+      title: "ResuMind AI – Resume Intelligence & Career Platform",
+      category: "AI & Machine Learning",
+      type: "Generative AI & Hybrid RAG Assistant",
+      featured: true,
+      description: "An AI-powered resume analysis, job matching, and interview preparation platform powered by Google Gemini AI and Hybrid RAG (FAISS + BM25 + Cross-Encoder) for contextual document intelligence.",
+      technologies: ["Python", "Streamlit", "Google Gemini AI", "Hybrid RAG", "FAISS", "BM25", "Sentence Transformers", "PyPDF"],
+      highlights: [
+        "Engineered a Hybrid RAG pipeline combining FAISS dense vector search, BM25 keyword matching, and Cross-Encoder re-ranking for grounded retrieval.",
+        "Integrated Google Gemini AI for in-depth resume audits, identifying strengths, critical skill gaps, and ATS-tailored recommendations.",
+        "Developed an intelligent Job Match engine calculating compatibility scores and alignment metrics between resumes and job descriptions.",
+        "Built an interactive AI Mock Interview module generating role-specific questions and evaluating answers with actionable feedback."
+      ],
+      github: "https://github.com/amitx22/Ai-Resume-Intelligence",
+      demo: "https://ai-resume-intelligence-ewmnhaehwreunf6wmgj55k.streamlit.app/",
+      icon: "Brain",
+      badge: "GenAI & RAG"
+    },
+    {
       id: "salary-prediction-app",
       title: "Salary Prediction App",
       category: "AI & Machine Learning",
@@ -133,7 +152,7 @@ export const portfolioData = {
         "Integrated statistical graphs to visualize salary trends across various job roles and experience brackets."
       ],
       github: "https://github.com/amitx22/salary-prediction-app",
-      demo: "https://github.com/amitx22",
+      demo: "https://github.com/amitx22/salary-prediction-app",
       icon: "TrendingUp",
       badge: "Machine Learning"
     },
@@ -152,14 +171,14 @@ export const portfolioData = {
         "Fully optimized responsive layout delivering seamless experience on smartphones, tablets, and desktops."
       ],
       github: "https://github.com/amitx22/smart-study-dashboard",
-      demo: "https://github.com/amitx22",
+      demo: "https://github.com/amitx22/smart-study-dashboard",
       icon: "CheckSquare",
       badge: "Web Application"
     },
     {
       id: "personal-portfolio",
       title: "Dynamic AI & Full-Stack Portfolio Portal",
-      category: "React & Cloud Integration",
+      category: "Full Stack Web",
       type: "Modern Web Platform",
       featured: true,
       description: "Modern, high-aesthetic responsive portfolio built with React, interactive glassmorphism, responsive grid architecture, and real-time Gmail dispatch connectivity for instant recruiter inquiries.",
