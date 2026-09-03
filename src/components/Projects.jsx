@@ -9,11 +9,11 @@ import {
   Globe, 
   Sparkles, 
   Check, 
-  Layers,
-  Code2
+  Brain
 } from 'lucide-react';
 
 const projectIconMap = {
+  Brain: <Brain size={22} color="#ec4899" />,
   TrendingUp: <TrendingUp size={22} color="#38bdf8" />,
   CheckSquare: <CheckSquare size={22} color="#10b981" />,
   Globe: <Globe size={22} color="#a855f7" />
@@ -192,7 +192,7 @@ const Projects = () => {
 
                   {project.id !== 'personal-portfolio' ? (
                     <a
-                      href={project.github}
+                      href={project.demo || project.github}
                       target="_blank"
                       rel="noreferrer"
                       className="btn btn-primary btn-sm"
